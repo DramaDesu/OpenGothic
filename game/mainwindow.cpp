@@ -255,7 +255,12 @@ void MainWindow::paintEvent(PaintEvent& event) {
   renderer.dbgDraw(p);
 
   const float scale = Gothic::interfaceScale(this);
-  if(Gothic::inst().doFrate() && !Gothic::inst().isDesktop()) {
+  // FPS overlay:
+  //   - in main menu: always shown (useful for perf sanity-checking before
+  //     loading a save, especially under WSL/Dozen where FPS can be jittery);
+  //   - in-game:      gated by doFrate() toggle (marvin console "toggle frame").
+  const bool showFps = Gothic::inst().isDesktop() || Gothic::inst().doFrate();
+  if(showFps) {
     char fpsT[64]={};
     std::snprintf(fpsT,sizeof(fpsT),"fps = %.2f",fps.get());
 
@@ -1181,7 +1186,7 @@ void MainWindow::render(){
 
     static bool once=true;
     if(once) {
-      Gothic::inst().emitGlobalSoundWav("GAMESTART.WAV");
+      // Gothic::inst().emitGlobalSoundWav("GAMESTART.WAV");
       once=false;
       }
 

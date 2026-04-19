@@ -170,6 +170,18 @@ void MenuRoot::keyRepeatEvent(Tempest::KeyEvent &e) {
 
 void MenuRoot::keyDownEvent(KeyEvent &e) {
   const float scale = Gothic::interfaceScale(this);
+
+#ifdef OPENGOTHIC_MARVIN_IN_MAIN_MENU
+  // Let F2 bubble up to MainWindow's shortcut so Marvin console can open
+  // from the main menu once "marvin" cheat is typed. Without this ignore(),
+  // the menu silently eats the key and the console shortcut never fires.
+  // Gated by a CMake option so release builds retain original behaviour.
+  if(e.key == Event::K_F2 && Gothic::inst().isMarvinEnabled()) {
+    e.ignore();
+    return;
+    }
+#endif
+
   size_t sz = std::extent_v<decltype(cheatCode)>;
   for(size_t i=1; i<sz; ++i)
     cheatCode[i-1] = cheatCode[i];

@@ -4,9 +4,11 @@
 
 #include <zenkit/Logger.hh>
 
+#if defined(OPENGOTHIC_WITH_VULKAN)
 #include <Tempest/VulkanApi>
+#endif
 
-#if defined(_MSC_VER)
+#if defined(OPENGOTHIC_WITH_DX12)
 #include <Tempest/DirectX12Api>
 #endif
 
@@ -25,6 +27,7 @@
 #include "commandline.h"
 
 #include <dmusic.h>
+#include <stdexcept>
 
 std::string_view selectDevice(const Tempest::AbstractGraphicsApi& api) {
   auto d = api.devices();
@@ -47,13 +50,13 @@ std::unique_ptr<Tempest::AbstractGraphicsApi> mkApi(const CommandLine& g) {
   Tempest::ApiFlags flg = g.isValidationMode() ? Tempest::ApiFlags::Validation : Tempest::ApiFlags::NoFlags;
   switch(g.graphicsApi()) {
     case CommandLine::DirectX12:
-#if defined(_MSC_VER)
+#if defined(OPENGOTHIC_WITH_DX12)
       return std::make_unique<Tempest::DirectX12Api>(flg);
 #else
       break;
 #endif
     case CommandLine::Vulkan:
-#if !defined(__APPLE__)
+#if defined(OPENGOTHIC_WITH_VULKAN)
       return std::make_unique<Tempest::VulkanApi>(flg);
 #else
       break;
@@ -62,8 +65,12 @@ std::unique_ptr<Tempest::AbstractGraphicsApi> mkApi(const CommandLine& g) {
 
 #if defined(__APPLE__)
   return std::make_unique<Tempest::MetalApi>(flg);
-#else
+#elif defined(OPENGOTHIC_WITH_VULKAN)
   return std::make_unique<Tempest::VulkanApi>(flg);
+#elif defined(OPENGOTHIC_WITH_DX12)
+  return std::make_unique<Tempest::DirectX12Api>(flg);
+#else
+  throw std::runtime_error("No graphics backend available in this build");
 #endif
   }
 

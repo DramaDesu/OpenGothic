@@ -6,7 +6,6 @@
 #include <Tempest/Window>
 #include <Tempest/CommandBuffer>
 #include <Tempest/Fence>
-#include <Tempest/VulkanApi>
 #include <Tempest/Device>
 #include <Tempest/VertexBuffer>
 #include <Tempest/UniformBuffer>
